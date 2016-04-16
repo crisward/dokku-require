@@ -51,7 +51,7 @@ If you need more control over the creation process or you'd like to use
 a non-official plugins the below syntax can be used. Each command in the
 array will be run in sequence.
 
-```
+```json
   "dokku":{
     "plugins":[
       {
