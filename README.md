@@ -35,7 +35,7 @@ With the addition of a dokku section (see below).
   "dokku":{
     "plugins":[
       "mariadb","redis"
-    ]
+    ],
     "volumes":[
       {"host":"$APP_DIR/storage/","app":"/app/storage/"}
     ]
