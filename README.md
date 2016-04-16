@@ -37,7 +37,7 @@ With the addition of a dokku section (see below).
       "mariadb","redis"
     ],
     "volumes":[
-      {"host":"$APP_DIR/storage/","app":"/app/storage/"}
+      {"host":"/var/lib/dokku/data/storage","app":"/storage"}
     ]
   }
 }
@@ -62,5 +62,4 @@ array will be run in sequence.
   }
 ```
 
-`$APP` will be replaced with your app name, `$APP_DIR` will be replaced with 
-your apps directory ie `/home/dokku/yourapp`
+`$APP` will be replaced with your app name,
