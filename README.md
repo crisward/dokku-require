@@ -56,7 +56,7 @@ array will be run in sequence.
     "plugins":[
       {
         "name":"mariadb",
-        "commands":["create mydb","link mydb $APP"]
+        "commands":["mariadb:create mydb","mariadb:link mydb $APP"]
       }
     ]
   }
