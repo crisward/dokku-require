@@ -44,11 +44,11 @@ With the addition of a dokku section (see below).
 ```
 
 The `"dokku":{"plugins":[]}` array can contain a list of plugin names, which 
-by default will be created with the app name and linked, to your app.
-This will only work the official plugins which have create and link methods.
+by default will be created with the app name and linked to your app.
+This will only work the official plugins which have `create` and `link` methods.
 
 If you need more control over the creation process or you'd like to use
-a non-official plugin the below syntax can be used. Each command in the
+a non-official plugins the below syntax can be used. Each command in the
 array will be run in sequence.
 
 ```
@@ -61,3 +61,6 @@ array will be run in sequence.
     ]
   }
 ```
+
+`$APP` will be replaced with your app name, `$APP_DIR` will be replaced with 
+your apps directory ie `/home/dokku/yourapp`
