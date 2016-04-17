@@ -31,6 +31,7 @@ require_pre_receive_app() {
         fi     	
         let COUNTER=COUNTER+1 
       done
+      require_add_volumes
     fi
   }||{
     # ignore any previous issues and build regardless...
