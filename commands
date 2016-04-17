@@ -1,0 +1,27 @@
+#!/usr/bin/env bash
+set -eo pipefail; [[ $DOKKU_TRACE ]] && set -x
+source "$PLUGIN_CORE_AVAILABLE_PATH/common/functions"
+source "$PLUGIN_AVAILABLE_PATH/require/functions"
+
+case "$1" in
+  help | require:help)
+    help_content_func() {
+      declare desc="return help_content string"
+      cat<<help_content
+    require, reads app.json and sets up plugins and volumes for the app
+help_content
+    }
+
+    if [[ $1 = "require:help" ]] ; then
+      echo -e 'some help info here'
+      echo ''
+    else
+      help_content_func
+    fi
+    ;;
+
+  *)
+    exit "$DOKKU_NOT_IMPLEMENTED_EXIT"
+    ;;
+
+esac

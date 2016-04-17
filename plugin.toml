@@ -1,0 +1,4 @@
+[plugin]
+description = "dokku plugin to setup all the requirement for your app on push"
+version = "0.1.0"
+[plugin.config]

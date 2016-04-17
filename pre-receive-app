@@ -1,0 +1,42 @@
+#!/usr/bin/env bash
+
+set -eo pipefail; [[ $DOKKU_TRACE ]] && set -x
+source "$PLUGIN_CORE_AVAILABLE_PATH/common/functions"
+source "$PLUGIN_AVAILABLE_PATH/require/functions"
+
+
+require_pre_receive_app() {
+  declare desc="reads app.json and builds plugins"
+  local APP="$1"
+  local IMAGE_SOURCE_TYPE="$2"
+  local TMP_WORK_DIR="$3"
+  local REV="$4"
+  local APP_JSON_FILE="$TMP_WORK_DIR/app.json"
+  # check if app.json exists
+  if [[ -f $APP_JSON_FILE ]];then
+    # get each plugin from json, limit to 100 to prevent silly loop
+    COUNTER=0
+    while [ $COUNTER -lt 10 ]; do
+      {
+        PLUGIN=$(require_get_app_plugins "[\"dokku\"][\"plugins\"][${COUNTER}]" < "$APP_JSON_FILE") && 
+        if [[ $PLUGIN == *"{"* ]];then
+          echo 'install'
+          require_install_commands $COUNTER
+        else
+          require_install_link $PLUGIN
+        fi
+      }||{
+        break
+      }     	
+      let COUNTER=COUNTER+1 
+    done
+    
+    exit 1 # temp to stop build while testing
+  fi
+}
+
+
+
+require_pre_receive_app "$@"
+
+
