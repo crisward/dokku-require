@@ -63,3 +63,10 @@ array will be run in sequence.
 ```
 
 `$APP` will be replaced with your app name,
+
+## Todo.
+
+* Check host folder exists before creating volume, then create
+* Check if plugin is installed, then show error if it isn't
+* Create demo github repo that can be used with dokku clone and dokku require to build an app (wordpress, sentry?)
+* general code tidy, peer review etc
