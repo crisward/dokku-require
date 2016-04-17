@@ -20,7 +20,7 @@ require_install_link(){
   {
     dokku_log_info1 "Setting up $plugin"
     dokku $plugin:create $APP &&
-    DOKKU_CONFIG_RESTART=false dokku $plugin:link $APP $APP
+    DOKKU_CONFIG_RESTART=false dokku $plugin:link $APP $APP || true
   }||{
     dokku_log_info1 "$plugin already setup"
   }
@@ -37,7 +37,7 @@ require_install_commands(){
       break
     else
       # swap $APP for app name in commands
-      DOKKU_CONFIG_RESTART=false $(sed "s/\$APP/${APP}/g" <<< "dokku $COMMAND")
+      DOKKU_CONFIG_RESTART=false $(sed "s/\$APP/${APP}/g" <<< "dokku $COMMAND") || break
     fi    	
     let COUNT=COUNT+1
   done
