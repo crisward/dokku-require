@@ -2,13 +2,12 @@
 set -eo pipefail; [[ $DOKKU_TRACE ]] && set -x
 source "$PLUGIN_CORE_AVAILABLE_PATH/common/functions"
 
-require_main_cmd() {
-  declare desc="creates/updates app from remote git repo"
-  declare APP="$2"
-  local cmd="$1"
-
-  dokku_log_info1 "messing..."
-}
+# require_main_cmd() {
+#   declare desc="creates/updates app from remote git repo"
+#   declare APP="$2"
+#   local cmd="$1"
+#   dokku_log_info1 "messing..."
+# }
 
 require_get_app_plugins(){
   local JSON_NODE=$1
@@ -16,27 +15,30 @@ require_get_app_plugins(){
 }
 
 require_install_link(){
+  declare desc="installs and links plugin passed in"
   local plugin=$1
   {
     dokku_log_info1 "Setting up $plugin"
-    #dokku $plugin:create $APP && 
-    #dokku $plugin:link $APP $APP
+    dokku $plugin:create $APP &&
+    DOKKU_CONFIG_RESTART=false dokku $plugin:link $APP $APP
   }||{
     dokku_log_info1 "$plugin already setup"
   }
 }
 
 require_install_commands(){
+  declare desc="runs commands passed in from plugin list"
   local INDEX=$1
   # get each plugin from json, limit to 100 to prevent silly loop
   local COUNT=0
   while [ $COUNT -lt 10 ]; do
-    {
-      COMMAND=$(require_get_app_plugins "[\"dokku\"][\"plugins\"][${INDEX}][\"commands\"][${COUNT}]" < "$APP_JSON_FILE") && 
-      $(sed "s/\$APP/${APP}/g" <<< "dokku $COMMAND")
-    }||{
+    COMMAND=$(require_get_app_plugins "[\"dokku\"][\"plugins\"][${INDEX}][\"commands\"][${COUNT}]" < "$APP_JSON_FILE" 2>&1)
+    if [ $? -ne 0 ]; then
       break
-    }     	
+    else
+      # swap $APP for app name in commands
+      DOKKU_CONFIG_RESTART=false $(sed "s/\$APP/${APP}/g" <<< "dokku $COMMAND")
+    fi    	
     let COUNT=COUNT+1
   done
 }
