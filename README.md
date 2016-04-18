@@ -1,4 +1,4 @@
-(this is super early - please don't try and use)
+(this isn't polished, but should work as describe - tested on dokku 4.*)
 
 # Dokku Require
 
@@ -46,6 +46,19 @@ With the addition of a dokku section (see below).
 The `"dokku":{"plugins":[]}` array can contain a list of plugin names, which 
 by default will be created with the app name and linked to your app.
 This will only work the official plugins which have `create` and `link` methods.
+ie.
+
+* [CouchDB (beta)](https://github.com/dokku/dokku-couchdb)                     
+* [Elasticsearch (beta)](https://github.com/dokku/dokku-elasticsearch-plugin)  
+* [MariaDB (beta)](https://github.com/dokku/dokku-mariadb-plugin)              
+* [Memcached (beta)](https://github.com/dokku/dokku-memcached-plugin)          
+* [Mongo (beta)](https://github.com/dokku/dokku-mongo-plugin)                  
+* [MySQL (beta)](https://github.com/dokku/dokku-mysql-plugin)                  
+* [Nats (beta)](https://github.com/dokku/dokku-nats)                           
+* [Postgres (beta)](https://github.com/dokku/dokku-postgres-plugin)            
+* [RabbitMQ (beta)](https://github.com/dokku/dokku-rabbitmq-plugin)            
+* [Redis (beta)](https://github.com/dokku/dokku-redis-plugin)                  
+* [RethinkDB (beta)](https://github.com/dokku/dokku-rethinkdb-plugin)   
 
 If you need more control over the creation process or you'd like to use
 a non-official plugins the below syntax can be used. Each command in the
