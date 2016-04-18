@@ -14,14 +14,18 @@ require_get_json_len(){
 
 require_install_link(){
   declare desc="installs and links plugin passed in"
-  local plugin=$1
-  {
-    dokku_log_info1 "Setting up $plugin"
-    dokku $plugin:create $APP &&
-    DOKKU_CONFIG_RESTART=false dokku $plugin:link $APP $APP || true
-  }||{
-    dokku_log_info1 "$plugin already setup"
-  }
+  local PLUGIN=$1
+  if [[ -d "$PLUGIN_AVAILABLE_PATH/$PLUGIN/" ]]; then
+    {
+      dokku_log_info1 "Setting up $PLUGIN"
+      dokku $PLUGIN:create $APP && 
+      DOKKU_CONFIG_RESTART=false dokku $PLUGIN:link $APP $APP
+    }||{
+      dokku_log_info1 "$PLUGIN already setup"
+    }
+  else
+    dokku_log_info1 "$PLUGIN plugin is not available on your system - attempting to contine without $PLUGIN"
+  fi
 }
 
 require_install_commands(){
@@ -29,17 +33,22 @@ require_install_commands(){
   local INDEX=$1
   # get each plugin from json
   local COUNT=0
-  local TOTAL=$(require_get_json_len "[\"dokku\"][\"plugins\"][${INDEX}][\"commands\"]" < "$APP_JSON_FILE" 2>&1)
-  while [ $COUNT -lt $TOTAL ]; do
-    COMMAND=$(require_get_app_plugins "[\"dokku\"][\"plugins\"][${INDEX}][\"commands\"][${COUNT}]" < "$APP_JSON_FILE" 2>&1)
-    if [ $? -ne 0 ]; then
-      break
-    else
-      # swap $APP for app name in commands
-      DOKKU_CONFIG_RESTART=false $(sed "s/\$APP/${APP}/g" <<< "dokku $COMMAND") || break
-    fi    	
-    let COUNT=COUNT+1
-  done
+  local PLUGIN=$(require_get_app_plugins "[\"dokku\"][\"plugins\"][${INDEX}][\"name\"]" < "$APP_JSON_FILE" 2>&1)
+  if [[ -d "$PLUGIN_AVAILABLE_PATH/$PLUGIN/" ]]; then
+    local TOTAL=$(require_get_json_len "[\"dokku\"][\"plugins\"][${INDEX}][\"commands\"]" < "$APP_JSON_FILE" 2>&1)
+    while [ $COUNT -lt $TOTAL ]; do
+      COMMAND=$(require_get_app_plugins "[\"dokku\"][\"plugins\"][${INDEX}][\"commands\"][${COUNT}]" < "$APP_JSON_FILE" 2>&1)
+      if [ $? -ne 0 ]; then
+        break
+      else
+        # swap $APP for app name in commands
+        DOKKU_CONFIG_RESTART=false $(sed "s/\$APP/${APP}/g" <<< "dokku $COMMAND") || break
+      fi    	
+      let COUNT=COUNT+1
+    done
+  else
+    dokku_log_info1 "$PLUGIN plugin is not available on your system - attempting to contine without $PLUGIN"
+  fi
 }
 
 require_add_volumes(){
@@ -54,6 +63,7 @@ require_add_volumes(){
     if [[ $? -eq 0 && -n "$HOSTPATH" && -n "$APPPATH" ]]; then
       # swap $APP for app name in commands
       $(sed "s/\$APP/${APP}/g" <<< "dokku docker-options:add $APP deploy,run -v $HOSTPATH:$APPPATH")
+      $(sed "s/\$APP/${APP}/g" <<< "mkdir -p $HOSTPATH")
     else
       break
     fi    	

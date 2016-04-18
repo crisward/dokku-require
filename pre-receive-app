@@ -13,34 +13,27 @@ require_pre_receive_app() {
   local REV="$4"
   local APP_JSON_FILE="$TMP_WORK_DIR/app.json"
   
-  { 
-    # check if app.json exists
-    if [[ -f $APP_JSON_FILE ]];then
-      # get each plugin from json, limit to 10 to prevent silly loop
-      COUNTER=0
-      while [ $COUNTER -lt 10 ]; do
-        PLUGIN=$(require_get_app_plugins "[\"dokku\"][\"plugins\"][${COUNTER}]" < "$APP_JSON_FILE" 2>&1)
-        if [ $? -ne 0 ]; then
-          break
+
+  # check if app.json exists
+  if [[ -f $APP_JSON_FILE ]];then
+    # get each plugin from json, limit to 10 to prevent silly loop
+    COUNTER=0
+    local TOTAL=$(require_get_json_len "[\"dokku\"][\"plugins\"]" < "$APP_JSON_FILE" 2>&1)
+    while [ $COUNTER -lt $TOTAL ]; do
+      PLUGIN=$(require_get_app_plugins "[\"dokku\"][\"plugins\"][${COUNTER}]" < "$APP_JSON_FILE" 2>&1)
+      if [ $? -ne 0 ]; then
+        break
+      else
+        if [[ $PLUGIN == *"{"* ]];then
+          require_install_commands $COUNTER
         else
-          if [[ $PLUGIN == *"{"* ]];then
-            require_install_commands $COUNTER
-          else
-            require_install_link $PLUGIN
-          fi
-        fi     	
-        let COUNTER=COUNTER+1 
-      done
-      require_add_volumes
-    fi
-  }||{
-    # ignore any previous issues and build regardless...
-    true
-  }
+          require_install_link $PLUGIN
+        fi
+      fi     	
+      let COUNTER=COUNTER+1 
+    done
+    require_add_volumes
+  fi
 }
 
-
-
 require_pre_receive_app "$@"
-
-
