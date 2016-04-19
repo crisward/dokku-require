@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+set -eo pipefail; [[ $DOKKU_TRACE ]] && set -x
+source "$PLUGIN_AVAILABLE_PATH/require/functions"
+
+clone_main_cmd "$@"

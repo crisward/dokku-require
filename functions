@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 set -eo pipefail; [[ $DOKKU_TRACE ]] && set -x
+DOKKU_REQUIRE_PREFIX="${DOKKU_REQUIRE_PREFIX:-dokku}"
 source "$PLUGIN_CORE_AVAILABLE_PATH/common/functions"
 
 require_get_app_plugins(){
@@ -33,11 +34,11 @@ require_install_commands(){
   local INDEX=$1
   # get each plugin from json
   local COUNT=0
-  local PLUGIN=$(require_get_app_plugins "[\"dokku\"][\"plugins\"][${INDEX}][\"name\"]" < "$APP_JSON_FILE" 2>&1)
+  local PLUGIN=$(require_get_app_plugins "[\"$DOKKU_REQUIRE_PREFIX\"][\"plugins\"][${INDEX}][\"name\"]" < "$APP_JSON_FILE" 2>&1)
   if [[ -d "$PLUGIN_AVAILABLE_PATH/$PLUGIN/" ]]; then
-    local TOTAL=$(require_get_json_len "[\"dokku\"][\"plugins\"][${INDEX}][\"commands\"]" < "$APP_JSON_FILE" 2>&1)
+    local TOTAL=$(require_get_json_len "[\"$DOKKU_REQUIRE_PREFIX\"][\"plugins\"][${INDEX}][\"commands\"]" < "$APP_JSON_FILE" 2>&1)
     while [ $COUNT -lt $TOTAL ]; do
-      COMMAND=$(require_get_app_plugins "[\"dokku\"][\"plugins\"][${INDEX}][\"commands\"][${COUNT}]" < "$APP_JSON_FILE" 2>&1)
+      COMMAND=$(require_get_app_plugins "[\"$DOKKU_REQUIRE_PREFIX\"][\"plugins\"][${INDEX}][\"commands\"][${COUNT}]" < "$APP_JSON_FILE" 2>&1)
       if [ $? -ne 0 ]; then
         break
       else
@@ -55,11 +56,11 @@ require_add_volumes(){
   declare desc="adds volumes from app.json file"
   # get each plugin from json, limit to 20 to prevent silly loop
   local COUNT=0
-  local TOTAL=$(require_get_json_len "[\"dokku\"][\"volumes\"]" < "$APP_JSON_FILE" 2>&1)
+  local TOTAL=$(require_get_json_len "[\"$DOKKU_REQUIRE_PREFIX\"][\"volumes\"]" < "$APP_JSON_FILE" 2>&1)
   dokku_log_info1 "Setting up $TOTAL volumes from app.json"
   while [ $COUNT -lt $TOTAL ]; do
-    local HOSTPATH=$(require_get_app_plugins "[\"dokku\"][\"volumes\"][${COUNT}][\"host\"]" < "$APP_JSON_FILE" 2>&1)
-    local APPPATH=$(require_get_app_plugins "[\"dokku\"][\"volumes\"][${COUNT}][\"app\"]" < "$APP_JSON_FILE" 2>&1)
+    local HOSTPATH=$(require_get_app_plugins "[\"$DOKKU_REQUIRE_PREFIX\"][\"volumes\"][${COUNT}][\"host\"]" < "$APP_JSON_FILE" 2>&1)
+    local APPPATH=$(require_get_app_plugins "[\"$DOKKU_REQUIRE_PREFIX\"][\"volumes\"][${COUNT}][\"app\"]" < "$APP_JSON_FILE" 2>&1)
     if [[ $? -eq 0 && -n "$HOSTPATH" && -n "$APPPATH" ]]; then
       # swap $APP for app name in commands
       $(sed "s/\$APP/${APP}/g" <<< "dokku docker-options:add $APP deploy,run -v $HOSTPATH:$APPPATH")
@@ -69,4 +70,14 @@ require_add_volumes(){
     fi    	
     let COUNT=COUNT+1
   done 
+}
+
+require_mode_cmd() {
+  declare desc="sets DOKKU_REQUIRE_PREFIX"
+  local cmd="mode"
+  [[ -d $DOKKU_ROOT/.dokkurc ]] || mkdir -p "$DOKKU_ROOT/.dokkurc"
+  [[ -z $2 ]] && dokku_log_fail "Please specify an app to run the command on"
+    
+  echo "Setting DOKKU_REQUIRE_PREFIX to $2"
+  echo "export DOKKU_REQUIRE_PREFIX=$2" > "$DOKKU_ROOT/.dokkurc/DOKKU_REQUIRE_PREFIX"
 }

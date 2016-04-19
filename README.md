@@ -74,7 +74,35 @@ array will be run in sequence.
   }
 ```
 
-`$APP` will be replaced with your app name,
+## Alternative Settings for Development and Testing
+
+It's often neccessary to have different volumes or database configurations
+for production, development and testing. To enable this you can set a different 'mode'
+for 'dokku require' which overrides the key used within the app.json file.
+This allows you to setup mutiple configurations for each of your chosen environments
+
+ie. Development mode could be set with
+```
+dokku require:mode dokku_dev
+```
+Then in your `app.json` you would set your development settings under that key.
+
+```json
+  "dokku":{
+    "plugins":["mariadb","redis"],
+    "volumes":[{"host":"/var/lib/dokku/data/storage","app":"/storage"}]
+  }
+  "dokku_dev":{
+    "plugins":["mariadb","redis"],
+    "volumes":[
+      {"host":"/var/lib/dokku/data/storage","app":"/storage"},
+      {"host":"/home/vagrant/myapp/src","app":"/app/src"}
+    ]
+  }
+```
+
+**Note:** this setting is global for all apps on your server, by default it is set to dokku.
+
 
 ## Apps Using this Plugin
 
@@ -82,8 +110,15 @@ As this is very new, I've only created a single app using this.
 
 * https://github.com/crisward/dokku-ghost - create a ghost blog in dokku
 
-## Furthrer Development
 
-It's often neccessary to have different volumes or database configurations
-for production, development and testing, so I'll be adding a mechanism to
-have different settings for those situations. Expect an update shortyly.
+## License
+
+(The MIT License)
+
+Copyright (c) 2015 Cris Ward
+
+Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the 'Software'), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED 'AS IS', WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.

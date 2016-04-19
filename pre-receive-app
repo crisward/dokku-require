@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 
 set -eo pipefail; [[ $DOKKU_TRACE ]] && set -x
+DOKKU_REQUIRE_PREFIX="${DOKKU_REQUIRE_PREFIX:-dokku}"
 source "$PLUGIN_CORE_AVAILABLE_PATH/common/functions"
 source "$PLUGIN_AVAILABLE_PATH/require/functions"
 
@@ -18,9 +19,9 @@ require_pre_receive_app() {
   if [[ -f $APP_JSON_FILE ]];then
     # get each plugin from json, limit to 10 to prevent silly loop
     COUNTER=0
-    local TOTAL=$(require_get_json_len "[\"dokku\"][\"plugins\"]" < "$APP_JSON_FILE" 2>&1)
+    local TOTAL=$(require_get_json_len "[\"$DOKKU_REQUIRE_PREFIX\"][\"plugins\"]" < "$APP_JSON_FILE" 2>&1)
     while [ $COUNTER -lt $TOTAL ]; do
-      PLUGIN=$(require_get_app_plugins "[\"dokku\"][\"plugins\"][${COUNTER}]" < "$APP_JSON_FILE" 2>&1)
+      PLUGIN=$(require_get_app_plugins "[\"$DOKKU_REQUIRE_PREFIX\"][\"plugins\"][${COUNTER}]" < "$APP_JSON_FILE" 2>&1)
       if [ $? -ne 0 ]; then
         break
       else

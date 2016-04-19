@@ -9,17 +9,32 @@ case "$1" in
       declare desc="return help_content string"
       cat<<help_content
     require, reads app.json and sets up plugins and volumes for the app
+    require:mode, sets an alternative prefix for the app.json file
 help_content
     }
 
     if [[ $1 = "require:help" ]] ; then
-      echo -e 'some help info here'
+      echo -e 'Usage: add an app.json file to your repo before pushing'
+      echo ''
+      echo 'For more help see https://github.com/crisward/dokku-require'
+      echo ''
+      echo 'dokku require:mode'
+      echo ''
+      echo 'Sets the key to be read from in app.json, defaults to "dokku"'
       echo ''
     else
       help_content_func
     fi
     ;;
-
+    
+  require)
+    require_main_cmd "$@"
+    ;;
+    
+  require:mode)
+    require_mode_cmd "$@"
+    ;;
+    
   *)
     exit "$DOKKU_NOT_IMPLEMENTED_EXIT"
     ;;
