@@ -1,4 +1,4 @@
-(this isn't polished, but should work as describe - tested on dokku 4.*)
+(this isn't polished, but should work as described - tested on dokku 4.*)
 
 # Dokku Require
 
@@ -8,7 +8,6 @@ required by your app.
 ## Requirements
 
 * dokku 0.4.0+
-
 
 ## Installation
 
@@ -45,7 +44,7 @@ With the addition of a dokku section (see below).
 
 The `"dokku":{"plugins":[]}` array can contain a list of plugin names, which 
 by default will be created with the app name and linked to your app.
-This will only work the official plugins which have `create` and `link` methods.
+This will only work with the official plugins which have `create` and `link` methods.
 ie.
 
 * [CouchDB (beta)](https://github.com/dokku/dokku-couchdb)                     
@@ -77,9 +76,14 @@ array will be run in sequence.
 
 `$APP` will be replaced with your app name,
 
-## Todo.
+## Apps Using this Plugin
 
-* ~~Check host folder exists before creating volume, then create~~
-* ~~Check if plugin is installed, then show error if it isn't~~
-* Create demo github repo that can be used with dokku clone and dokku require to build an app (wordpress, sentry?)
-* general code tidy, peer review etc
+As this is very new, I've only created a single app using this. 
+
+* https://github.com/crisward/dokku-ghost - create a ghost blog in dokku
+
+## Furthrer Development
+
+It's often neccessary to have different volumes or database configurations
+for production, development and testing, so I'll be adding a mechanism to
+have different settings for those situations. Expect an update shortyly.
