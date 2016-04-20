@@ -1,6 +1,4 @@
-(this isn't polished, but should work as described - tested on dokku 4.*)
-
-# Dokku Require
+<img src="https://cdn.rawgit.com/crisward/dokku-require/master/require-logo.svg" style="width:350px"/>
 
 A plugin which allow you to specify plugins and volumes
 required by your app.
@@ -110,6 +108,11 @@ As this is very new, I've only created a single app using this.
 
 * https://github.com/crisward/dokku-ghost - create a ghost blog in dokku
 
+## Credit
+
+
+Thanks to [Jose Gonzalez](https://github.com/josegonzalez) for code tidy
+and the [Noun Project](https://thenounproject.com/) for the logo
 
 ## License
 
