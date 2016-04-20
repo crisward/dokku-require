@@ -15,7 +15,7 @@ require_get_json_len(){
 
 require_install_link() {
   declare desc="installs and links plugin passed in"
-  declare APP="$1" PLUGIN="$1"
+  declare APP="$1" PLUGIN="$2"
   if [[ -d "$PLUGIN_AVAILABLE_PATH/$PLUGIN/" ]]; then
     {
       dokku_log_info1 "Setting up $PLUGIN"
