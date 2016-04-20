@@ -1,4 +1,4 @@
-<img src="https://cdn.rawgit.com/crisward/dokku-require/master/require-logo.svg" style="width:350px"/>
+<img src="https://cdn.rawgit.com/crisward/dokku-require/master/require-logo.svg" width="350"/>
 
 A plugin which allow you to specify plugins and volumes
 required by your app.
