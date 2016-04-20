@@ -18,7 +18,7 @@ require_pre_receive_app() {
 
   # get each plugin from json, limit to 10 to prevent silly loop
   COUNTER=0
-  if TOTAL=$(require_get_json_len "[\"$DOKKU_REQUIRE_PREFIX\"][\"plugins\"]" < "$APP_JSON_FILE"); then
+  if TOTAL=$(require_get_json_len "[\"$DOKKU_REQUIRE_PREFIX\"][\"plugins\"]" < "$APP_JSON_FILE" 2>&1); then
     while [[ "$COUNTER" -lt "$TOTAL" ]]; do
       PLUGIN=$(require_get_app_plugins "[\"$DOKKU_REQUIRE_PREFIX\"][\"plugins\"][${COUNTER}]" < "$APP_JSON_FILE" 2>&1)
       if [[ $? -ne 0 ]]; then
