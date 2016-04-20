@@ -3,15 +3,13 @@ set -eo pipefail; [[ $DOKKU_TRACE ]] && set -x
 DOKKU_REQUIRE_PREFIX="${DOKKU_REQUIRE_PREFIX:-dokku}"
 source "$PLUGIN_CORE_AVAILABLE_PATH/common/functions"
 
-require_get_app_plugins() {
-  declare "Retrieves the config for an application plugin"
-  declare JSON_NODE="$1"
+require_get_app_plugins(){
+  local JSON_NODE=$1
   cat | python -c 'import json,sys;obj=json.load(sys.stdin);print json.dumps(obj'"${JSON_NODE}"').strip("\"")';
 }
 
-require_get_json_len() {
-  declare "Retrieves the length of a json entity"
-  declare JSON_NODE="$1"
+require_get_json_len(){
+  local JSON_NODE=$1
   cat | python -c 'import json,sys;obj=json.load(sys.stdin);print len(obj'"${JSON_NODE}"')';
 }
 
