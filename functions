@@ -60,23 +60,24 @@ require_add_volumes() {
   local APPPATH COUNT HOSTPATH TOTAL
 
   COUNT=0
-  TOTAL=$(require_get_json_len "[\"$DOKKU_REQUIRE_PREFIX\"][\"volumes\"]" < "$APP_JSON_FILE" 2>&1)
-  dokku_log_info1 "Setting up $TOTAL volumes from app.json"
-  while [[ "$COUNT" -lt "$TOTAL" ]]; do
-    HOSTPATH=$(require_get_app_plugins "[\"$DOKKU_REQUIRE_PREFIX\"][\"volumes\"][${COUNT}][\"host\"]" < "$APP_JSON_FILE" 2>&1)
-    APPPATH=$(require_get_app_plugins "[\"$DOKKU_REQUIRE_PREFIX\"][\"volumes\"][${COUNT}][\"app\"]" < "$APP_JSON_FILE" 2>&1)
+  if TOTAL=$(require_get_json_len "[\"$DOKKU_REQUIRE_PREFIX\"][\"volumes\"]" < "$APP_JSON_FILE" 2>&1); then
+    dokku_log_info1 "Setting up $TOTAL volumes from app.json"
+    while [[ "$COUNT" -lt "$TOTAL" ]]; do
+      HOSTPATH=$(require_get_app_plugins "[\"$DOKKU_REQUIRE_PREFIX\"][\"volumes\"][${COUNT}][\"host\"]" < "$APP_JSON_FILE" 2>&1)
+      APPPATH=$(require_get_app_plugins "[\"$DOKKU_REQUIRE_PREFIX\"][\"volumes\"][${COUNT}][\"app\"]" < "$APP_JSON_FILE" 2>&1)
 
-    if [[ $? -ne 0 ]] || [[ -z "$HOSTPATH" ]] || [[ -z "$APPPATH" ]]; then
-      break
-    fi
+      if [[ $? -ne 0 ]] || [[ -z "$HOSTPATH" ]] || [[ -z "$APPPATH" ]]; then
+        break
+      fi
 
-    # swap $APP for app name in commands
-    HOSTPATH="${HOSTPATH//\$APP/$APP}"
-    APPPATH="${HOSTPATH//\$APP/$APP}"
-    mkdir -p "$HOSTPATH"
-    dokku docker-options:add "$APP" deploy,run -v "$HOSTPATH:$APPPATH"
-    let COUNT=COUNT+1
-  done
+      # swap $APP for app name in commands
+      HOSTPATH="${HOSTPATH//\$APP/$APP}"
+      APPPATH="${HOSTPATH//\$APP/$APP}"
+      mkdir -p "$HOSTPATH"
+      dokku docker-options:add "$APP" deploy,run -v "$HOSTPATH:$APPPATH"
+      let COUNT=COUNT+1
+    done
+  fi
 }
 
 require_mode_cmd() {
