@@ -8,33 +8,31 @@ source "$PLUGIN_AVAILABLE_PATH/require/functions"
 
 require_pre_receive_app() {
   declare desc="reads app.json and builds plugins"
-  local APP="$1"
-  local IMAGE_SOURCE_TYPE="$2"
-  local TMP_WORK_DIR="$3"
-  local REV="$4"
+  local APP="$1" IMAGE_SOURCE_TYPE="$2" TMP_WORK_DIR="$3" REV="$4"
   local APP_JSON_FILE="$TMP_WORK_DIR/app.json"
-  
+  local TOTAL PLUGIN
 
-  # check if app.json exists
-  if [[ -f $APP_JSON_FILE ]];then
-    # get each plugin from json, limit to 10 to prevent silly loop
-    COUNTER=0
-    local TOTAL=$(require_get_json_len "[\"$DOKKU_REQUIRE_PREFIX\"][\"plugins\"]" < "$APP_JSON_FILE" 2>&1)
-    while [ $COUNTER -lt $TOTAL ]; do
-      PLUGIN=$(require_get_app_plugins "[\"$DOKKU_REQUIRE_PREFIX\"][\"plugins\"][${COUNTER}]" < "$APP_JSON_FILE" 2>&1)
-      if [ $? -ne 0 ]; then
-        break
-      else
-        if [[ $PLUGIN == *"{"* ]];then
-          require_install_commands $COUNTER
-        else
-          require_install_link $PLUGIN
-        fi
-      fi     	
-      let COUNTER=COUNTER+1 
-    done
-    require_add_volumes
+  if [[ ! -f "$APP_JSON_FILE" ]]; then
+    return
   fi
+
+  # get each plugin from json, limit to 10 to prevent silly loop
+  COUNTER=0
+  TOTAL=$(require_get_json_len "[\"$DOKKU_REQUIRE_PREFIX\"][\"plugins\"]" < "$APP_JSON_FILE" 2>&1)
+  while [[ "$COUNTER" -lt "$TOTAL" ]]; do
+    PLUGIN=$(require_get_app_plugins "[\"$DOKKU_REQUIRE_PREFIX\"][\"plugins\"][${COUNTER}]" < "$APP_JSON_FILE" 2>&1)
+    if [[ $? -ne 0 ]]; then
+      break
+    fi
+
+    if [[ "$PLUGIN" == *"{"* ]]; then
+      require_install_commands "$APP" "$COUNTER"
+    else
+      require_install_link "$APP" "$PLUGIN"
+    fi
+    let COUNTER=$((COUNTER + 1))
+  done
+  require_add_volumes "$APP"
 }
 
 require_pre_receive_app "$@"
