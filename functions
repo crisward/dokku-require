@@ -72,7 +72,7 @@ require_add_volumes() {
 
       # swap $APP for app name in commands
       HOSTPATH="${HOSTPATH//\$APP/$APP}"
-      APPPATH="${HOSTPATH//\$APP/$APP}"
+      APPPATH="${APPPATH//\$APP/$APP}"
       mkdir -p "$HOSTPATH"
       dokku docker-options:add "$APP" deploy,run -v "$HOSTPATH:$APPPATH"
       let COUNT=COUNT+1
