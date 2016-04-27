@@ -108,7 +108,7 @@ As this is very new, I've only created a single app using this.
 
 * https://github.com/crisward/dokku-ghost - create a ghost blog in dokku
 
-**If you'd like me include your app here, send me a pull request, it'd be nice to have a big list of easy to install apps**
+**If you'd like include your app here, send a pull request, it'd be nice to have a big list of easy to install apps**
 
 ## Credit
 
