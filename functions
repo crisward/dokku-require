@@ -23,6 +23,9 @@ require_install_link() {
       DOKKU_CONFIG_RESTART=false dokku "$PLUGIN:link" "$APP" "$APP"
     }||{
       dokku_log_info1 "$PLUGIN already setup"
+      DOKKU_CONFIG_RESTART=false dokku "$PLUGIN:link" "$APP" "$APP"
+    }||{
+      dokku_log_info1 "$PLUGIN already linked"
     }
   else
     dokku_log_info1 "$PLUGIN plugin is not available on your system - attempting to contine without $PLUGIN"
