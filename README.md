@@ -40,6 +40,8 @@ With the addition of a dokku section (see below).
 }
 ```
 
+## Plugins
+
 The `"dokku":{"plugins":[]}` array can contain a list of plugin names, which 
 by default will be created with the app name and linked to your app.
 This will only work with the official plugins which have `create` and `link` methods.
@@ -71,6 +73,25 @@ array will be run in sequence.
     ]
   }
 ```
+
+## Volumes
+
+Volumes are shared folders between your app's container and the host machine.
+By default these will be created in all phased (build,run,deploy) but you can optionally declaire this in your setup
+ie.
+```json
+   "volumes":[
+      {"host":"/var/lib/dokku/data/storage","app":"/storage","phases":"build,deploy"}
+    ]
+```
+You can also use the `$APP` name in the paths, which will be replaced with your app name
+```json
+   "volumes":[
+      {"host":"/mystorage/$APP/images","app":"/images","phases":"deploy"}
+    ]
+```
+
+
 
 ## Alternative Settings for Development and Testing
 

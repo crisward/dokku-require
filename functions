@@ -68,7 +68,10 @@ require_add_volumes() {
     while [[ "$COUNT" -lt "$TOTAL" ]]; do
       HOSTPATH=$(require_get_app_plugins "[\"$DOKKU_REQUIRE_PREFIX\"][\"volumes\"][${COUNT}][\"host\"]" < "$APP_JSON_FILE" 2>&1)
       APPPATH=$(require_get_app_plugins "[\"$DOKKU_REQUIRE_PREFIX\"][\"volumes\"][${COUNT}][\"app\"]" < "$APP_JSON_FILE" 2>&1)
-
+      PHASES=$(require_get_app_plugins "[\"$DOKKU_REQUIRE_PREFIX\"][\"volumes\"][${COUNT}][\"phases\"]" < "$APP_JSON_FILE" 2>&1)
+      if [[ -z "$PHASES" ]]; then 
+        PHASES="build,deploy,run"
+      fi
       if [[ $? -ne 0 ]] || [[ -z "$HOSTPATH" ]] || [[ -z "$APPPATH" ]]; then
         break
       fi
@@ -77,7 +80,7 @@ require_add_volumes() {
       HOSTPATH="${HOSTPATH//\$APP/$APP}"
       APPPATH="${APPPATH//\$APP/$APP}"
       mkdir -p "$HOSTPATH"
-      dokku docker-options:add "$APP" build,deploy,run -v "$HOSTPATH:$APPPATH"
+      dokku docker-options:add "$APP" "$PHASES" -v "$HOSTPATH:$APPPATH"
       let COUNT=COUNT+1
     done
   fi
