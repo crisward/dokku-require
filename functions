@@ -17,16 +17,14 @@ require_install_link() {
   declare desc="installs and links plugin passed in"
   declare APP="$1" PLUGIN="$2"
   if [[ -d "$PLUGIN_AVAILABLE_PATH/$PLUGIN/" ]]; then
-    {
+    if ! dokku "$PLUGIN:exists" "$APP" > /dev/null 2>&1; then
       dokku_log_info1 "Setting up $PLUGIN"
-      dokku "$PLUGIN:create" "$APP" &&
+      dokku "$PLUGIN:create" "$APP"
+    fi
+    
+    if ! dokku "$PLUGIN:linked" "$APP" "$APP" > /dev/null 2>&1; then
       DOKKU_CONFIG_RESTART=false dokku "$PLUGIN:link" "$APP" "$APP"
-    }||{
-      dokku_log_info1 "$PLUGIN already setup"
-      DOKKU_CONFIG_RESTART=false dokku "$PLUGIN:link" "$APP" "$APP"
-    }||{
-      dokku_log_info1 "$PLUGIN already linked"
-    }
+    fi
   else
     dokku_log_info1 "$PLUGIN plugin is not available on your system - attempting to contine without $PLUGIN"
   fi
