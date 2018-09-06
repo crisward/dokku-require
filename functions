@@ -66,7 +66,12 @@ require_add_volumes() {
     while [[ "$COUNT" -lt "$TOTAL" ]]; do
       HOSTPATH=$(require_get_app_plugins "[\"$DOKKU_REQUIRE_PREFIX\"][\"volumes\"][${COUNT}][\"host\"]" < "$APP_JSON_FILE" 2>&1)
       APPPATH=$(require_get_app_plugins "[\"$DOKKU_REQUIRE_PREFIX\"][\"volumes\"][${COUNT}][\"app\"]" < "$APP_JSON_FILE" 2>&1)
+      
+      # "phases" key is optional
+      set +eo pipefail
       PHASES=$(require_get_app_plugins "[\"$DOKKU_REQUIRE_PREFIX\"][\"volumes\"][${COUNT}][\"phases\"]" < "$APP_JSON_FILE" 2>&1)
+      set -eo pipefail
+      
       if [[ -z "$PHASES" ]]; then 
         PHASES="build,deploy,run"
       fi
