@@ -3,14 +3,45 @@ set -eo pipefail; [[ $DOKKU_TRACE ]] && set -x
 DOKKU_REQUIRE_PREFIX="${DOKKU_REQUIRE_PREFIX:-dokku}"
 source "$PLUGIN_CORE_AVAILABLE_PATH/common/functions"
 
+require_get_python_executable() {
+  declare -a executables=("python3" "python2" "python")
+  local executable
+
+  for e in "${executables[@]}"
+  do
+    if ( command -v "$e" >/dev/null 2>&1 ); then
+      echo "$e"
+      break
+    fi
+  done
+}
+
+require_get_python_version() {
+  declare desc="determine the install Python version"
+
+  eval "$(require_get_python_executable) -c 'from __future__ import print_function; import sys; print(sys.version_info.major)'"
+}
+
 require_get_app_plugins(){
   local JSON_NODE=$1
-  cat | python -c 'import json,sys;obj=json.load(sys.stdin);print json.dumps(obj'"${JSON_NODE}"').strip("\"")';
+  local python_version=$(require_get_python_version)
+  if [ "$python_version" -ge 3 ]; then
+    cat | python3 -c 'import json,sys;obj=json.load(sys.stdin);print(json.dumps(obj'"${JSON_NODE}"').strip("\""))';
+  else
+    cat | python -c 'import json,sys;obj=json.load(sys.stdin);print json.dumps(obj'"${JSON_NODE}"').strip("\"")';
+  fi
 }
 
 require_get_json_len(){
   local JSON_NODE=$1
-  cat | python -c 'import json,sys;obj=json.load(sys.stdin);print len(obj'"${JSON_NODE}"')';
+  local python=$(require_get_python_executable)
+  local python_version=$(require_get_python_version)
+  if [ "$python_version" -ge 3 ]; then
+    cat | python3 -c 'import json,sys;obj=json.load(sys.stdin);print(len(obj'"${JSON_NODE}"'))';
+  else
+    cat | python -c 'import json,sys;obj=json.load(sys.stdin);print len(obj'"${JSON_NODE}"')';
+  fi
+
 }
 
 require_install_link() {
@@ -66,13 +97,13 @@ require_add_volumes() {
     while [[ "$COUNT" -lt "$TOTAL" ]]; do
       HOSTPATH=$(require_get_app_plugins "[\"$DOKKU_REQUIRE_PREFIX\"][\"volumes\"][${COUNT}][\"host\"]" < "$APP_JSON_FILE" 2>&1)
       APPPATH=$(require_get_app_plugins "[\"$DOKKU_REQUIRE_PREFIX\"][\"volumes\"][${COUNT}][\"app\"]" < "$APP_JSON_FILE" 2>&1)
-      
+
       # "phases" key is optional
       set +eo pipefail
       PHASES=$(require_get_app_plugins "[\"$DOKKU_REQUIRE_PREFIX\"][\"volumes\"][${COUNT}][\"phases\"]" < "$APP_JSON_FILE" 2>&1)
       set -eo pipefail
-      
-      if [[ -z "$PHASES" ]]; then 
+
+      if [[ -z "$PHASES" ]]; then
         PHASES="build,deploy,run"
       fi
       if [[ $? -ne 0 ]] || [[ -z "$HOSTPATH" ]] || [[ -z "$APPPATH" ]]; then
